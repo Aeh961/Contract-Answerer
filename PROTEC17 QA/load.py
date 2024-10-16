@@ -9,6 +9,7 @@ import os
 import chromadb
 
 
+
 def load_chunk_persist_pdf() -> Chroma:
     OPENAI_API_KEY=""
     pdf_folder_path =os.path.abspath("C:\\Users\\abdal\\OneDrive\\Desktop\\PROTEC17 QA\\Contracts")
