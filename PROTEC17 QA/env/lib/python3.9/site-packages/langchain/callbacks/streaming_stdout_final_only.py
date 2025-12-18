@@ -1,5 +1,4 @@
 """Callback Handler streams to stdout on new llm token."""
-
 import sys
 from typing import Any, Dict, List, Optional
 

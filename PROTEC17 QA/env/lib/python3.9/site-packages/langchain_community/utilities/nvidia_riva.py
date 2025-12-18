@@ -25,8 +25,7 @@ from typing import (
 
 from langchain_core.messages import AnyMessage, BaseMessage
 from langchain_core.prompt_values import PromptValue
-from langchain_core.runnables import RunnableConfig, RunnableSerializable
-from pydantic import (
+from langchain_core.pydantic_v1 import (
     AnyHttpUrl,
     BaseModel,
     Field,
@@ -34,6 +33,7 @@ from pydantic import (
     root_validator,
     validator,
 )
+from langchain_core.runnables import RunnableConfig, RunnableSerializable
 
 if TYPE_CHECKING:
     import riva.client
@@ -110,7 +110,7 @@ class RivaAuthMixin(BaseModel):
     """Configuration for the authentication to a Riva service connection."""
 
     url: Union[AnyHttpUrl, str] = Field(
-        AnyHttpUrl("http://localhost:50051"),
+        AnyHttpUrl("http://localhost:50051", scheme="http"),
         description="The full URL where the Riva service can be found.",
         examples=["http://localhost:50051", "https://user@pass:riva.example.com"],
     )
@@ -471,8 +471,7 @@ class RivaASR(
     def invoke(
         self,
         input: ASRInputType,
-        config: Optional[RunnableConfig] = None,
-        **kwargs: Any,
+        _: Optional[RunnableConfig] = None,
     ) -> ASROutputType:
         """Transcribe the audio bytes into a string with Riva."""
         # create an output text generator with Riva
@@ -568,10 +567,7 @@ class RivaTTS(
             ) from err
 
     def invoke(
-        self,
-        input: TTSInputType,
-        config: Optional[RunnableConfig] = None,
-        **kwargs: Any,
+        self, input: TTSInputType, _: Union[RunnableConfig, None] = None
     ) -> TTSOutputType:
         """Perform TTS by taking a string and outputting the entire audio file."""
         return b"".join(self.transform(iter([input])))

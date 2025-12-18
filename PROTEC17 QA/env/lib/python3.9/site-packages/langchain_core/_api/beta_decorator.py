@@ -14,8 +14,7 @@ import contextlib
 import functools
 import inspect
 import warnings
-from collections.abc import Generator
-from typing import Any, Callable, TypeVar, Union, cast
+from typing import Any, Callable, Generator, Type, TypeVar, Union, cast
 
 from langchain_core._api.internal import is_caller_internal
 
@@ -27,7 +26,7 @@ class LangChainBetaWarning(DeprecationWarning):
 # PUBLIC API
 
 
-T = TypeVar("T", bound=Union[Callable[..., Any], type])
+T = TypeVar("T", bound=Union[Callable[..., Any], Type])
 
 
 def beta(
@@ -127,9 +126,10 @@ def beta(
 
             def finalize(wrapper: Callable[..., Any], new_doc: str) -> T:
                 """Finalize the annotation of a class."""
-                # Can't set new_doc on some extension objects.
-                with contextlib.suppress(AttributeError):
+                try:
                     obj.__doc__ = new_doc
+                except AttributeError:  # Can't set on some extension objects.
+                    pass
 
                 def warn_if_direct_instance(
                     self: Any, *args: Any, **kwargs: Any
@@ -154,7 +154,7 @@ def beta(
             _name = _name or obj.fget.__qualname__
             old_doc = obj.__doc__
 
-            class _BetaProperty(property):
+            class _beta_property(property):
                 """A beta property."""
 
                 def __init__(self, fget=None, fset=None, fdel=None, doc=None):
@@ -185,7 +185,7 @@ def beta(
 
             def finalize(wrapper: Callable[..., Any], new_doc: str) -> Any:
                 """Finalize the property."""
-                return _BetaProperty(
+                return _beta_property(
                     fget=obj.fget, fset=obj.fset, fdel=obj.fdel, doc=new_doc
                 )
 
@@ -212,10 +212,25 @@ def beta(
                 wrapper.__doc__ = new_doc
                 return cast(T, wrapper)
 
-        old_doc = inspect.cleandoc(old_doc or "").strip("\n") or ""
-        components = [message, addendum]
+        old_doc = inspect.cleandoc(old_doc or "").strip("\n")
+
+        # old_doc can be None
+        if not old_doc:
+            old_doc = ""
+
+        # Modify the docstring to include a beta notice.
+        notes_header = "\nNotes\n-----"
+        components = [
+            message,
+            addendum,
+        ]
         details = " ".join([component.strip() for component in components if component])
-        new_doc = f".. beta::\n" f"   {details}\n\n" f"{old_doc}\n"
+        new_doc = (
+            f"[*Beta*] {old_doc}\n"
+            f"{notes_header if notes_header not in old_doc else ''}\n"
+            f".. beta::\n"
+            f"   {details}"
+        )
 
         if inspect.iscoroutinefunction(obj):
             finalized = finalize(awarning_emitting_wrapper, new_doc)
@@ -270,7 +285,7 @@ def warn_beta(
             message += f" {addendum}"
 
     warning = LangChainBetaWarning(message)
-    warnings.warn(warning, category=LangChainBetaWarning, stacklevel=4)
+    warnings.warn(warning, category=LangChainBetaWarning, stacklevel=2)
 
 
 def surface_langchain_beta_warnings() -> None:

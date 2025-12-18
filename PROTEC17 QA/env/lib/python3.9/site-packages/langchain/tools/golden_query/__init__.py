@@ -1,5 +1,4 @@
 """Golden API toolkit."""
-
 from typing import TYPE_CHECKING, Any
 
 from langchain._api import create_importer

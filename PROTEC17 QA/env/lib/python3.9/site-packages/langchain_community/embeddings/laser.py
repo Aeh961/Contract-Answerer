@@ -2,8 +2,7 @@ from typing import Any, Dict, List, Optional
 
 import numpy as np
 from langchain_core.embeddings import Embeddings
-from langchain_core.utils import pre_init
-from pydantic import BaseModel, ConfigDict
+from langchain_core.pydantic_v1 import BaseModel, Extra, root_validator
 
 LASER_MULTILINGUAL_MODEL: str = "laser2"
 
@@ -27,7 +26,7 @@ class LaserEmbeddings(BaseModel, Embeddings):
         embeddings = encoder.encode_sentences(["Hello", "World"])
     """
 
-    lang: Optional[str] = None
+    lang: Optional[str]
     """The language or language code you'd like to use
     If empty, this implementation will default
     to using a multilingual earlier LASER encoder model (called laser2)
@@ -35,13 +34,14 @@ class LaserEmbeddings(BaseModel, Embeddings):
     https://github.com/facebookresearch/flores/blob/main/flores200/README.md#languages-in-flores-200
     """
 
-    _encoder_pipeline: Any = None  # : :meta private:
+    _encoder_pipeline: Any  # : :meta private:
 
-    model_config = ConfigDict(
-        extra="forbid",
-    )
+    class Config:
+        """Configuration for this pydantic object."""
 
-    @pre_init
+        extra = Extra.forbid
+
+    @root_validator()
     def validate_environment(cls, values: Dict) -> Dict:
         """Validate that laser_encoders has been installed."""
         try:

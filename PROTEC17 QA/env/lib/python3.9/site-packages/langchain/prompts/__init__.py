@@ -27,7 +27,6 @@ from multiple components. Prompt classes and functions make constructing
                     ChatPromptValue
 
 """  # noqa: E501
-
 from typing import TYPE_CHECKING, Any
 
 from langchain_core.example_selectors import (

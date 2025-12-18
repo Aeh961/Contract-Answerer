@@ -1,5 +1,4 @@
 """Load summarizing chains."""
-
 from typing import Any, Mapping, Optional, Protocol
 
 from langchain_core.callbacks import Callbacks

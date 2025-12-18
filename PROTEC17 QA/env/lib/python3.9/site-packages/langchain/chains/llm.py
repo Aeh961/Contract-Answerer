@@ -1,5 +1,4 @@
 """Chain that just formats a prompt and calls an LLM."""
-
 from __future__ import annotations
 
 import warnings
@@ -17,11 +16,13 @@ from langchain_core.language_models import (
     BaseLanguageModel,
     LanguageModelInput,
 )
+from langchain_core.load.dump import dumpd
 from langchain_core.messages import BaseMessage
 from langchain_core.output_parsers import BaseLLMOutputParser, StrOutputParser
 from langchain_core.outputs import ChatGeneration, Generation, LLMResult
 from langchain_core.prompt_values import PromptValue
 from langchain_core.prompts import BasePromptTemplate, PromptTemplate
+from langchain_core.pydantic_v1 import Extra, Field
 from langchain_core.runnables import (
     Runnable,
     RunnableBinding,
@@ -30,7 +31,6 @@ from langchain_core.runnables import (
 )
 from langchain_core.runnables.configurable import DynamicRunnable
 from langchain_core.utils.input import get_colored_text
-from pydantic import ConfigDict, Field
 
 from langchain.chains.base import Chain
 
@@ -38,7 +38,7 @@ from langchain.chains.base import Chain
 @deprecated(
     since="0.1.17",
     alternative="RunnableSequence, e.g., `prompt | llm`",
-    removal="1.0",
+    removal="0.3.0",
 )
 class LLMChain(Chain):
     """Chain to run queries against LLMs.
@@ -48,7 +48,6 @@ class LLMChain(Chain):
 
         .. code-block:: python
 
-            from langchain_core.output_parsers import StrOutputParser
             from langchain_core.prompts import PromptTemplate
             from langchain_openai import OpenAI
 
@@ -57,7 +56,7 @@ class LLMChain(Chain):
                 input_variables=["adjective"], template=prompt_template
             )
             llm = OpenAI()
-            chain = prompt | llm | StrOutputParser()
+            chain = prompt | llm
 
             chain.invoke("your adjective here")
 
@@ -94,10 +93,11 @@ class LLMChain(Chain):
     If false, will return a bunch of extra information about the generation."""
     llm_kwargs: dict = Field(default_factory=dict)
 
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-        extra="forbid",
-    )
+    class Config:
+        """Configuration for this pydantic object."""
+
+        extra = Extra.forbid
+        arbitrary_types_allowed = True
 
     @property
     def input_keys(self) -> List[str]:
@@ -240,9 +240,8 @@ class LLMChain(Chain):
             callbacks, self.callbacks, self.verbose
         )
         run_manager = callback_manager.on_chain_start(
-            None,
+            dumpd(self),
             {"input_list": input_list},
-            name=self.get_name(),
         )
         try:
             response = self.generate(input_list, run_manager=run_manager)
@@ -261,9 +260,8 @@ class LLMChain(Chain):
             callbacks, self.callbacks, self.verbose
         )
         run_manager = await callback_manager.on_chain_start(
-            None,
+            dumpd(self),
             {"input_list": input_list},
-            name=self.get_name(),
         )
         try:
             response = await self.agenerate(input_list, run_manager=run_manager)

@@ -8,8 +8,7 @@ import aiohttp
 import requests
 from langchain_core._api.deprecation import deprecated
 from langchain_core.embeddings import Embeddings
-from langchain_core.utils import pre_init
-from pydantic import BaseModel
+from langchain_core.pydantic_v1 import BaseModel, root_validator
 
 
 def is_endpoint_live(url: str, headers: Optional[dict], payload: Any) -> bool:
@@ -59,7 +58,7 @@ class NeMoEmbeddings(BaseModel, Embeddings):
     model: str = "NV-Embed-QA-003"
     api_endpoint_url: str = "http://localhost:8088/v1/embeddings"
 
-    @pre_init
+    @root_validator()
     def validate_environment(cls, values: Dict) -> Dict:
         """Validate that the end point is alive using the values that are provided."""
 

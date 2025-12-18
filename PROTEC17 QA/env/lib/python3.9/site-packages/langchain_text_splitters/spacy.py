@@ -20,8 +20,6 @@ class SpacyTextSplitter(TextSplitter):
         separator: str = "\n\n",
         pipeline: str = "en_core_web_sm",
         max_length: int = 1_000_000,
-        *,
-        strip_whitespace: bool = True,
         **kwargs: Any,
     ) -> None:
         """Initialize the spacy text splitter."""
@@ -30,14 +28,10 @@ class SpacyTextSplitter(TextSplitter):
             pipeline, max_length=max_length
         )
         self._separator = separator
-        self._strip_whitespace = strip_whitespace
 
     def split_text(self, text: str) -> List[str]:
         """Split incoming text and return chunks."""
-        splits = (
-            s.text if self._strip_whitespace else s.text_with_ws
-            for s in self._tokenizer(text).sents
-        )
+        splits = (s.text for s in self._tokenizer(text).sents)
         return self._merge_splits(splits, self._separator)
 
 

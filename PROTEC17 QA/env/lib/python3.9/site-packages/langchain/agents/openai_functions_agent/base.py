@@ -1,5 +1,4 @@
 """Module implements an agent that uses OpenAI's APIs function enabled API."""
-
 from typing import Any, List, Optional, Sequence, Tuple, Type, Union
 
 from langchain_core._api import deprecated
@@ -17,11 +16,10 @@ from langchain_core.prompts.chat import (
     HumanMessagePromptTemplate,
     MessagesPlaceholder,
 )
+from langchain_core.pydantic_v1 import root_validator
 from langchain_core.runnables import Runnable, RunnablePassthrough
 from langchain_core.tools import BaseTool
 from langchain_core.utils.function_calling import convert_to_openai_function
-from pydantic import model_validator
-from typing_extensions import Self
 
 from langchain.agents import BaseSingleActionAgent
 from langchain.agents.format_scratchpad.openai_functions import (
@@ -32,7 +30,7 @@ from langchain.agents.output_parsers.openai_functions import (
 )
 
 
-@deprecated("0.1.0", alternative="create_openai_functions_agent", removal="1.0")
+@deprecated("0.1.0", alternative="create_openai_functions_agent", removal="0.3.0")
 class OpenAIFunctionsAgent(BaseSingleActionAgent):
     """An Agent driven by OpenAIs function powered API.
 
@@ -43,42 +41,28 @@ class OpenAIFunctionsAgent(BaseSingleActionAgent):
         prompt: The prompt for this agent, should support agent_scratchpad as one
             of the variables. For an easy way to construct this prompt, use
             `OpenAIFunctionsAgent.create_prompt(...)`
-        output_parser: The output parser for this agent. Should be an instance of
-            OpenAIFunctionsAgentOutputParser.
-            Defaults to OpenAIFunctionsAgentOutputParser.
     """
 
     llm: BaseLanguageModel
     tools: Sequence[BaseTool]
     prompt: BasePromptTemplate
-    output_parser: Type[OpenAIFunctionsAgentOutputParser] = (
+    output_parser: Type[
         OpenAIFunctionsAgentOutputParser
-    )
+    ] = OpenAIFunctionsAgentOutputParser
 
     def get_allowed_tools(self) -> List[str]:
         """Get allowed tools."""
         return [t.name for t in self.tools]
 
-    @model_validator(mode="after")
-    def validate_prompt(self) -> Self:
-        """Validate prompt.
-
-        Args:
-            values: Values to validate.
-
-        Returns:
-            Validated values.
-
-        Raises:
-            ValueError: If `agent_scratchpad` is not in the prompt.
-        """
-        prompt: BasePromptTemplate = self.prompt
+    @root_validator
+    def validate_prompt(cls, values: dict) -> dict:
+        prompt: BasePromptTemplate = values["prompt"]
         if "agent_scratchpad" not in prompt.input_variables:
             raise ValueError(
                 "`agent_scratchpad` should be one of the variables in the prompt, "
                 f"got {prompt.input_variables}"
             )
-        return self
+        return values
 
     @property
     def input_keys(self) -> List[str]:
@@ -87,8 +71,6 @@ class OpenAIFunctionsAgent(BaseSingleActionAgent):
 
     @property
     def functions(self) -> List[dict]:
-        """Get functions."""
-
         return [dict(convert_to_openai_function(t)) for t in self.tools]
 
     def plan(
@@ -101,16 +83,11 @@ class OpenAIFunctionsAgent(BaseSingleActionAgent):
         """Given input, decided what to do.
 
         Args:
-            intermediate_steps: Steps the LLM has taken to date,
-                along with observations.
-            callbacks: Callbacks to use. Defaults to None.
-            with_functions: Whether to use functions. Defaults to True.
+            intermediate_steps: Steps the LLM has taken to date, along with observations
             **kwargs: User inputs.
 
         Returns:
             Action specifying what tool to use.
-            If the agent is finished, returns an AgentFinish.
-            If the agent is not finished, returns an AgentAction.
         """
         agent_scratchpad = format_to_openai_function_messages(intermediate_steps)
         selected_inputs = {
@@ -139,18 +116,15 @@ class OpenAIFunctionsAgent(BaseSingleActionAgent):
         callbacks: Callbacks = None,
         **kwargs: Any,
     ) -> Union[AgentAction, AgentFinish]:
-        """Async given input, decided what to do.
+        """Given input, decided what to do.
 
         Args:
             intermediate_steps: Steps the LLM has taken to date,
-                along with observations.
-            callbacks: Callbacks to use. Defaults to None.
+                along with observations
             **kwargs: User inputs.
 
         Returns:
             Action specifying what tool to use.
-            If the agent is finished, returns an AgentFinish.
-            If the agent is not finished, returns an AgentAction.
         """
         agent_scratchpad = format_to_openai_function_messages(intermediate_steps)
         selected_inputs = {
@@ -171,20 +145,7 @@ class OpenAIFunctionsAgent(BaseSingleActionAgent):
         intermediate_steps: List[Tuple[AgentAction, str]],
         **kwargs: Any,
     ) -> AgentFinish:
-        """Return response when agent has been stopped due to max iterations.
-
-        Args:
-            early_stopping_method: The early stopping method to use.
-            intermediate_steps: Intermediate steps.
-            **kwargs: User inputs.
-
-        Returns:
-            AgentFinish.
-
-        Raises:
-            ValueError: If `early_stopping_method` is not `force` or `generate`.
-            ValueError: If `agent_decision` is not an AgentAction.
-        """
+        """Return response when agent has been stopped due to max iterations."""
         if early_stopping_method == "force":
             # `force` just returns a constant string
             return AgentFinish(
@@ -254,17 +215,7 @@ class OpenAIFunctionsAgent(BaseSingleActionAgent):
         ),
         **kwargs: Any,
     ) -> BaseSingleActionAgent:
-        """Construct an agent from an LLM and tools.
-
-        Args:
-            llm: The LLM to use as the agent.
-            tools: The tools to use.
-            callback_manager: The callback manager to use. Defaults to None.
-            extra_prompt_messages: Extra prompt messages to use. Defaults to None.
-            system_message: The system message to use.
-                Defaults to a default system message.
-            kwargs: Additional parameters to pass to the agent.
-        """
+        """Construct an agent from an LLM and tools."""
         prompt = cls.create_prompt(
             extra_prompt_messages=extra_prompt_messages,
             system_message=system_message,
@@ -292,11 +243,8 @@ def create_openai_functions_agent(
 
     Returns:
         A Runnable sequence representing an agent. It takes as input all the same input
-            variables as the prompt passed in does. It returns as output either an
-            AgentAction or AgentFinish.
-
-    Raises:
-        ValueError: If `agent_scratchpad` is not in the prompt.
+        variables as the prompt passed in does. It returns as output either an
+        AgentAction or AgentFinish.
 
     Example:
 

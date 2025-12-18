@@ -1,10 +1,9 @@
-from typing import Any, Callable, Dict, Iterator, List, Optional
+from typing import Any, Dict, Iterator, List, Optional
 
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.language_models import LLM
 from langchain_core.outputs import GenerationChunk
-from langchain_core.utils import pre_init
-from pydantic import Field
+from langchain_core.pydantic_v1 import Field, root_validator
 
 
 class ExLlamaV2(LLM):
@@ -30,7 +29,7 @@ class ExLlamaV2(LLM):
     - Add support for custom stop sequences
     """
 
-    client: Any = None
+    client: Any
     model_path: str
     exllama_cache: Any = None
     config: Any = None
@@ -41,7 +40,7 @@ class ExLlamaV2(LLM):
     settings: Any = None
 
     # Langchain parameters
-    logfunc: Callable = print
+    logfunc = print
 
     stop_sequences: List[str] = Field("")
     """Sequences that immediately will stop the generator."""
@@ -59,7 +58,7 @@ class ExLlamaV2(LLM):
     disallowed_tokens: List[int] = Field(None)
     """List of tokens to disallow during generation."""
 
-    @pre_init
+    @root_validator()
     def validate_environment(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         try:
             import torch

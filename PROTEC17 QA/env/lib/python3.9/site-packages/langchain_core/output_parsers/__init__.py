@@ -12,7 +12,6 @@
 
     Serializable, Generation, PromptValue
 """  # noqa: E501
-
 from langchain_core.output_parsers.base import (
     BaseGenerationOutputParser,
     BaseLLMOutputParser,
@@ -24,11 +23,6 @@ from langchain_core.output_parsers.list import (
     ListOutputParser,
     MarkdownListOutputParser,
     NumberedListOutputParser,
-)
-from langchain_core.output_parsers.openai_tools import (
-    JsonOutputKeyToolsParser,
-    JsonOutputToolsParser,
-    PydanticToolsParser,
 )
 from langchain_core.output_parsers.pydantic import PydanticOutputParser
 from langchain_core.output_parsers.string import StrOutputParser
@@ -53,7 +47,4 @@ __all__ = [
     "XMLOutputParser",
     "JsonOutputParser",
     "PydanticOutputParser",
-    "JsonOutputToolsParser",
-    "JsonOutputKeyToolsParser",
-    "PydanticToolsParser",
 ]

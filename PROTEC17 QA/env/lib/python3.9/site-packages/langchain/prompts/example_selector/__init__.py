@@ -1,5 +1,4 @@
 """Logic for selecting examples to include in prompts."""
-
 from typing import TYPE_CHECKING, Any
 
 from langchain_core.example_selectors.length_based import (

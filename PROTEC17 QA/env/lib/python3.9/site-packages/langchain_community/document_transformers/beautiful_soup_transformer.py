@@ -132,7 +132,6 @@ class BeautifulSoupTransformer(BaseDocumentTransformer):
         Args:
             html_content: The original HTML content string.
             tags: A list of tags to be extracted from the HTML.
-            remove_comments: If set to True, the comments will be removed.
 
         Returns:
             A string combining the content of the extracted tags.
@@ -185,7 +184,6 @@ def get_navigable_strings(
 
     Args:
         element: A BeautifulSoup element.
-        remove_comments: If set to True, the comments will be removed.
 
     Returns:
         A generator of strings.

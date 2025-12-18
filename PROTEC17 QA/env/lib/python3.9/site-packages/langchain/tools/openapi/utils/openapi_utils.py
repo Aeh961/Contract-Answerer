@@ -1,5 +1,4 @@
 """Utility functions for parsing an OpenAPI spec. Kept for backwards compat."""
-
 from typing import TYPE_CHECKING, Any
 
 from langchain._api import create_importer

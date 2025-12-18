@@ -3,7 +3,6 @@
 This is a simple implementation of the BaseStore using a dictionary that is useful
 primarily for unit testing purposes.
 """
-
 from langchain_core.stores import InMemoryBaseStore, InMemoryByteStore, InMemoryStore
 
 __all__ = [

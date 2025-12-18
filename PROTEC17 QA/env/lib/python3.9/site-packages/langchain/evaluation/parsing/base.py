@@ -1,5 +1,4 @@
 """Evaluators for parsing strings."""
-
 import json
 from operator import eq
 from typing import Any, Callable, Optional, Union, cast

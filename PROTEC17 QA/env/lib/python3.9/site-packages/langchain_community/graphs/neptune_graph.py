@@ -22,7 +22,7 @@ class NeptuneQueryException(Exception):
 
 
 class BaseNeptuneGraph(ABC):
-    """Abstract base class for Neptune."""
+    """Abstract base class for Neptune"""
 
     @property
     def get_schema(self) -> str:
@@ -142,7 +142,7 @@ class BaseNeptuneGraph(ABC):
 class NeptuneAnalyticsGraph(BaseNeptuneGraph):
     """Neptune Analytics wrapper for graph operations.
 
-    Parameters:
+    Args:
         client: optional boto3 Neptune client
         credentials_profile_name: optional AWS profile name
         region_name: optional AWS region, e.g., us-west-2
@@ -272,13 +272,14 @@ class NeptuneAnalyticsGraph(BaseNeptuneGraph):
 class NeptuneGraph(BaseNeptuneGraph):
     """Neptune wrapper for graph operations.
 
-    Parameters:
+    Args:
         host: endpoint for the database instance
         port: port number for the database instance, default is 8182
         use_https: whether to use secure connection, default is True
         client: optional boto3 Neptune client
         credentials_profile_name: optional AWS profile name
         region_name: optional AWS region, e.g., us-west-2
+        service: optional service name, default is neptunedata
         sign: optional, whether to sign the request payload, default is True
 
     Example:

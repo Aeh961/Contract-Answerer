@@ -1,10 +1,8 @@
 """Abstract interface for document loader implementations."""
-
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import AsyncIterator, Iterator
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, AsyncIterator, Iterator, List, Optional
 
 from langchain_core.documents import Document
 from langchain_core.runnables import run_in_executor
@@ -12,10 +10,10 @@ from langchain_core.runnables import run_in_executor
 if TYPE_CHECKING:
     from langchain_text_splitters import TextSplitter
 
-from langchain_core.documents.base import Blob
+from langchain_core.document_loaders.blob_loaders import Blob
 
 
-class BaseLoader(ABC):  # noqa: B024
+class BaseLoader(ABC):
     """Interface for Document Loader.
 
     Implementations should implement the lazy-loading method using generators
@@ -26,17 +24,17 @@ class BaseLoader(ABC):  # noqa: B024
 
     # Sub-classes should not implement this method directly. Instead, they
     # should implement the lazy load method.
-    def load(self) -> list[Document]:
+    def load(self) -> List[Document]:
         """Load data into Document objects."""
         return list(self.lazy_load())
 
-    async def aload(self) -> list[Document]:
+    async def aload(self) -> List[Document]:
         """Load data into Document objects."""
         return [document async for document in self.alazy_load()]
 
     def load_and_split(
         self, text_splitter: Optional[TextSplitter] = None
-    ) -> list[Document]:
+    ) -> List[Document]:
         """Load Documents and split into chunks. Chunks are returned as Documents.
 
         Do not override this method. It should be considered to be deprecated!
@@ -53,12 +51,11 @@ class BaseLoader(ABC):  # noqa: B024
             try:
                 from langchain_text_splitters import RecursiveCharacterTextSplitter
             except ImportError as e:
-                msg = (
+                raise ImportError(
                     "Unable to import from langchain_text_splitters. Please specify "
                     "text_splitter or install langchain_text_splitters with "
                     "`pip install -U langchain-text-splitters`."
-                )
-                raise ImportError(msg) from e
+                ) from e
 
             _text_splitter: TextSplitter = RecursiveCharacterTextSplitter()
         else:
@@ -72,8 +69,9 @@ class BaseLoader(ABC):  # noqa: B024
         """A lazy loader for Documents."""
         if type(self).load != BaseLoader.load:
             return iter(self.load())
-        msg = f"{self.__class__.__name__} does not implement lazy_load()"
-        raise NotImplementedError(msg)
+        raise NotImplementedError(
+            f"{self.__class__.__name__} does not implement lazy_load()"
+        )
 
     async def alazy_load(self) -> AsyncIterator[Document]:
         """A lazy loader for Documents."""
@@ -109,7 +107,7 @@ class BaseBlobParser(ABC):
             Generator of documents
         """
 
-    def parse(self, blob: Blob) -> list[Document]:
+    def parse(self, blob: Blob) -> List[Document]:
         """Eagerly parse the blob into a document or documents.
 
         This is a convenience method for interactive development environment.

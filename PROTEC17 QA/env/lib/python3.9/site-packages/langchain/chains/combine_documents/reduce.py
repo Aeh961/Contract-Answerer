@@ -4,10 +4,9 @@ from __future__ import annotations
 
 from typing import Any, Callable, List, Optional, Protocol, Tuple
 
-from langchain_core._api import deprecated
 from langchain_core.callbacks import Callbacks
 from langchain_core.documents import Document
-from pydantic import ConfigDict
+from langchain_core.pydantic_v1 import Extra
 
 from langchain.chains.combine_documents.base import BaseCombineDocumentsChain
 
@@ -122,15 +121,6 @@ async def acollapse_docs(
     return Document(page_content=result, metadata=combined_metadata)
 
 
-@deprecated(
-    since="0.3.1",
-    removal="1.0",
-    message=(
-        "This class is deprecated. Please see the migration guide here for "
-        "a recommended replacement: "
-        "https://python.langchain.com/docs/versions/migrating_chains/map_reduce_chain/"
-    ),
-)
 class ReduceDocumentsChain(BaseCombineDocumentsChain):
     """Combine documents by recursively reducing them.
 
@@ -215,10 +205,11 @@ class ReduceDocumentsChain(BaseCombineDocumentsChain):
     If None, it will keep trying to collapse documents to fit token_max.
     Otherwise, after it reaches the max number, it will throw an error"""
 
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-        extra="forbid",
-    )
+    class Config:
+        """Configuration for this pydantic object."""
+
+        extra = Extra.forbid
+        arbitrary_types_allowed = True
 
     @property
     def _collapse_chain(self) -> BaseCombineDocumentsChain:

@@ -1,38 +1,50 @@
-import streamlit as st
-from langchain.llms import OpenAI
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import Chroma
-from langchain.chains import RetrievalQA
-from langchain_community.document_loaders import PyPDFLoader
 import os
-import chromadb
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import Chroma
 
+# Your API key must already be exported in the terminal:
+# export OPENAI_API_KEY="sk-proj-xxxx"
 
+def load_chunk_persist_pdf():
 
-def load_chunk_persist_pdf() -> Chroma:
-    OPENAI_API_KEY=""
-    pdf_folder_path =os.path.abspath("C:\\Users\\abdal\\OneDrive\\Desktop\\PROTEC17 QA\\Contracts")
-    documents = []
-    for file in os.listdir(pdf_folder_path):
-        if file.endswith('.pdf'):
-            pdf_path = os.path.join(pdf_folder_path, file)
-            loader = PyPDFLoader(pdf_path)
-            documents.extend(loader.load())
-    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=10)
-    chunked_documents = text_splitter.split_documents(documents)
-    client = chromadb.Client()
-    if client.list_collections():
-        consent_collection = client.create_collection("consent_collection")
-    else:
-        print("Collection already exists")
-    vectordb = Chroma.from_documents(
-        documents=chunked_documents,
-        embedding=OpenAIEmbeddings(openai_api_key= OPENAI_API_KEY),
-        persist_directory=os.path.abspath("C:\\Users\\abdal\\OneDrive\Desktop\PROTEC17 QA\\chromastore")
+    pdf_files = [
+        "Contracts/PROTEC17-Municipal-Court-CBA-2023-2026-FINAL.pdf",
+        "Contracts/PROTEC17-Seattle-Main-Executive-CBA-23-26-FINAL.pdf",
+        "Contracts/Supervisors-2021-2024.pdf"
+    ]
+
+    all_docs = []
+
+    # Load all PDFs
+    for pdf_path in pdf_files:
+        print(f"Loading: {pdf_path}")
+        loader = PyPDFLoader(pdf_path)
+        docs = loader.load()
+        all_docs.extend(docs)
+
+    # Split text into chunks
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000,
+        chunk_overlap=200
     )
+
+    split_docs = text_splitter.split_documents(all_docs)
+    print(f"Total chunks created: {len(split_docs)}")
+
+    # Create embeddings and store in Chroma
+    persist_dir = "chromastore"
+    embeddings = OpenAIEmbeddings()
+
+    vectordb = Chroma.from_documents(
+        documents=split_docs,
+        embedding=embeddings,
+        persist_directory=persist_dir
+    )
+
     vectordb.persist()
-    return vectordb
+    print(f"Vector store created at: {persist_dir}")
 
 
 if __name__ == "__main__":

@@ -36,8 +36,7 @@ class TelegramChatLoader(BaseChatLoader):
         """
         self.path = path if isinstance(path, str) else str(path)
 
-    @staticmethod
-    def _load_single_chat_session_html(file_path: str) -> ChatSession:
+    def _load_single_chat_session_html(self, file_path: str) -> ChatSession:
         """Load a single chat session from an HTML file.
 
         Args:
@@ -83,8 +82,7 @@ class TelegramChatLoader(BaseChatLoader):
 
         return ChatSession(messages=results)
 
-    @staticmethod
-    def _load_single_chat_session_json(file_path: str) -> ChatSession:
+    def _load_single_chat_session_json(self, file_path: str) -> ChatSession:
         """Load a single chat session from a JSON file.
 
         Args:
@@ -115,8 +113,7 @@ class TelegramChatLoader(BaseChatLoader):
 
         return ChatSession(messages=results)
 
-    @staticmethod
-    def _iterate_files(path: str) -> Iterator[str]:
+    def _iterate_files(self, path: str) -> Iterator[str]:
         """Iterate over files in a directory or zip file.
 
         Args:

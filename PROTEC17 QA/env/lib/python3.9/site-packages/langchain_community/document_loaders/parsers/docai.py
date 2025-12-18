@@ -4,7 +4,6 @@ You need to install two libraries to use this parser:
 pip install google-cloud-documentai
 pip install google-cloud-documentai-toolbox
 """
-
 import logging
 import re
 import time
@@ -37,7 +36,7 @@ class DocAIParsingResults:
 
 @deprecated(
     since="0.0.32",
-    removal="1.0",
+    removal="0.3.0",
     alternative_import="langchain_google_community.DocAIParser",
 )
 class DocAIParser(BaseBlobParser):

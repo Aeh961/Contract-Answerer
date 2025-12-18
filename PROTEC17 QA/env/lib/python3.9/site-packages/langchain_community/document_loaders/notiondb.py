@@ -1,4 +1,3 @@
-import logging
 from typing import Any, Dict, List, Optional
 
 import requests
@@ -10,10 +9,6 @@ NOTION_BASE_URL = "https://api.notion.com/v1"
 DATABASE_URL = NOTION_BASE_URL + "/databases/{database_id}/query"
 PAGE_URL = NOTION_BASE_URL + "/pages/{page_id}"
 BLOCK_URL = NOTION_BASE_URL + "/blocks/{block_id}/children"
-
-# Configure logging
-logging.basicConfig(level=logging.WARNING)
-logger = logging.getLogger(__name__)
 
 
 class NotionDBLoader(BaseLoader):
@@ -68,6 +63,7 @@ class NotionDBLoader(BaseLoader):
             List[Document]: List of documents.
         """
         page_summaries = self._retrieve_page_summaries()
+
         return list(self.load_page(page_summary) for page_summary in page_summaries)
 
     def _retrieve_page_summaries(
@@ -137,16 +133,11 @@ class NotionDBLoader(BaseLoader):
             elif prop_type == "status":
                 value = prop_data["status"]["name"] if prop_data["status"] else None
             elif prop_type == "people":
-                value = []
-                if prop_data["people"]:
-                    for item in prop_data["people"]:
-                        name = item.get("name")
-                        if not name:
-                            logger.warning(
-                                "Missing 'name' in 'people' property "
-                                f"for page {page_id}"
-                            )
-                        value.append(name)
+                value = (
+                    [item["name"] for item in prop_data["people"]]
+                    if prop_data["people"]
+                    else []
+                )
             elif prop_type == "date":
                 value = prop_data["date"] if prop_data["date"] else None
             elif prop_type == "last_edited_time":

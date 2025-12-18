@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from typing import Sequence
 
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts.chat import ChatPromptTemplate
@@ -13,10 +13,7 @@ from langchain.agents.output_parsers.openai_tools import OpenAIToolsAgentOutputP
 
 
 def create_openai_tools_agent(
-    llm: BaseLanguageModel,
-    tools: Sequence[BaseTool],
-    prompt: ChatPromptTemplate,
-    strict: Optional[bool] = None,
+    llm: BaseLanguageModel, tools: Sequence[BaseTool], prompt: ChatPromptTemplate
 ) -> Runnable:
     """Create an agent that uses OpenAI tools.
 
@@ -30,9 +27,6 @@ def create_openai_tools_agent(
         A Runnable sequence representing an agent. It takes as input all the same input
         variables as the prompt passed in does. It returns as output either an
         AgentAction or AgentFinish.
-
-    Raises:
-        ValueError: If the prompt is missing required variables.
 
     Example:
 
@@ -90,9 +84,7 @@ def create_openai_tools_agent(
     if missing_vars:
         raise ValueError(f"Prompt missing required variables: {missing_vars}")
 
-    llm_with_tools = llm.bind(
-        tools=[convert_to_openai_tool(tool, strict=strict) for tool in tools]
-    )
+    llm_with_tools = llm.bind(tools=[convert_to_openai_tool(tool) for tool in tools])
 
     agent = (
         RunnablePassthrough.assign(

@@ -1,15 +1,17 @@
 from __future__ import annotations
 
-from collections.abc import AsyncIterator, Iterator, Mapping
 from typing import (
     Any,
+    AsyncIterator,
     Callable,
+    Iterator,
+    List,
+    Mapping,
     Optional,
     Union,
     cast,
 )
 
-from pydantic import ConfigDict
 from typing_extensions import TypedDict
 
 from langchain_core.runnables.base import (
@@ -36,7 +38,7 @@ class RouterInput(TypedDict):
 
     Attributes:
         key: The key to route on.
-        input: The input to pass to the selected Runnable.
+        input: The input to pass to the selected runnable.
     """
 
     key: str
@@ -47,9 +49,6 @@ class RouterRunnable(RunnableSerializable[RouterInput, Output]):
     """
     Runnable that routes to a set of Runnables based on Input['key'].
     Returns the output of the selected Runnable.
-
-    Parameters:
-        runnables: A mapping of keys to Runnables.
 
     For example,
 
@@ -68,7 +67,7 @@ class RouterRunnable(RunnableSerializable[RouterInput, Output]):
     runnables: Mapping[str, Runnable[Any, Output]]
 
     @property
-    def config_specs(self) -> list[ConfigurableFieldSpec]:
+    def config_specs(self) -> List[ConfigurableFieldSpec]:
         return get_unique_config_specs(
             spec for step in self.runnables.values() for spec in step.config_specs
         )
@@ -81,9 +80,8 @@ class RouterRunnable(RunnableSerializable[RouterInput, Output]):
             runnables={key: coerce_to_runnable(r) for key, r in runnables.items()}
         )
 
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-    )
+    class Config:
+        arbitrary_types_allowed = True
 
     @classmethod
     def is_lc_serializable(cls) -> bool:
@@ -91,18 +89,17 @@ class RouterRunnable(RunnableSerializable[RouterInput, Output]):
         return True
 
     @classmethod
-    def get_lc_namespace(cls) -> list[str]:
+    def get_lc_namespace(cls) -> List[str]:
         """Get the namespace of the langchain object."""
         return ["langchain", "schema", "runnable"]
 
     def invoke(
-        self, input: RouterInput, config: Optional[RunnableConfig] = None, **kwargs: Any
+        self, input: RouterInput, config: Optional[RunnableConfig] = None
     ) -> Output:
         key = input["key"]
         actual_input = input["input"]
         if key not in self.runnables:
-            msg = f"No runnable associated with key '{key}'"
-            raise ValueError(msg)
+            raise ValueError(f"No runnable associated with key '{key}'")
 
         runnable = self.runnables[key]
         return runnable.invoke(actual_input, config)
@@ -116,28 +113,26 @@ class RouterRunnable(RunnableSerializable[RouterInput, Output]):
         key = input["key"]
         actual_input = input["input"]
         if key not in self.runnables:
-            msg = f"No runnable associated with key '{key}'"
-            raise ValueError(msg)
+            raise ValueError(f"No runnable associated with key '{key}'")
 
         runnable = self.runnables[key]
         return await runnable.ainvoke(actual_input, config)
 
     def batch(
         self,
-        inputs: list[RouterInput],
-        config: Optional[Union[RunnableConfig, list[RunnableConfig]]] = None,
+        inputs: List[RouterInput],
+        config: Optional[Union[RunnableConfig, List[RunnableConfig]]] = None,
         *,
         return_exceptions: bool = False,
         **kwargs: Optional[Any],
-    ) -> list[Output]:
+    ) -> List[Output]:
         if not inputs:
             return []
 
         keys = [input["key"] for input in inputs]
         actual_inputs = [input["input"] for input in inputs]
         if any(key not in self.runnables for key in keys):
-            msg = "One or more keys do not have a corresponding runnable"
-            raise ValueError(msg)
+            raise ValueError("One or more keys do not have a corresponding runnable")
 
         def invoke(
             runnable: Runnable, input: Input, config: RunnableConfig
@@ -154,26 +149,25 @@ class RouterRunnable(RunnableSerializable[RouterInput, Output]):
         configs = get_config_list(config, len(inputs))
         with get_executor_for_config(configs[0]) as executor:
             return cast(
-                list[Output],
+                List[Output],
                 list(executor.map(invoke, runnables, actual_inputs, configs)),
             )
 
     async def abatch(
         self,
-        inputs: list[RouterInput],
-        config: Optional[Union[RunnableConfig, list[RunnableConfig]]] = None,
+        inputs: List[RouterInput],
+        config: Optional[Union[RunnableConfig, List[RunnableConfig]]] = None,
         *,
         return_exceptions: bool = False,
         **kwargs: Optional[Any],
-    ) -> list[Output]:
+    ) -> List[Output]:
         if not inputs:
             return []
 
         keys = [input["key"] for input in inputs]
         actual_inputs = [input["input"] for input in inputs]
         if any(key not in self.runnables for key in keys):
-            msg = "One or more keys do not have a corresponding runnable"
-            raise ValueError(msg)
+            raise ValueError("One or more keys do not have a corresponding runnable")
 
         async def ainvoke(
             runnable: Runnable, input: Input, config: RunnableConfig
@@ -205,8 +199,7 @@ class RouterRunnable(RunnableSerializable[RouterInput, Output]):
         key = input["key"]
         actual_input = input["input"]
         if key not in self.runnables:
-            msg = f"No runnable associated with key '{key}'"
-            raise ValueError(msg)
+            raise ValueError(f"No runnable associated with key '{key}'")
 
         runnable = self.runnables[key]
         yield from runnable.stream(actual_input, config)
@@ -220,8 +213,7 @@ class RouterRunnable(RunnableSerializable[RouterInput, Output]):
         key = input["key"]
         actual_input = input["input"]
         if key not in self.runnables:
-            msg = f"No runnable associated with key '{key}'"
-            raise ValueError(msg)
+            raise ValueError(f"No runnable associated with key '{key}'")
 
         runnable = self.runnables[key]
         async for output in runnable.astream(actual_input, config):

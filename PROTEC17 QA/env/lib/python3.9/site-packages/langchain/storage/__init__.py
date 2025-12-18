@@ -5,7 +5,6 @@ to a simple key-value interface.
 
 The primary goal of these storages is to support implementation of caching.
 """
-
 from typing import TYPE_CHECKING, Any
 
 from langchain_core.stores import (

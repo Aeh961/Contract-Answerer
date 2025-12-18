@@ -1,0 +1,21 @@
+{
+  "name": "contract-answerer",
+  "version": "1.0.0",
+  "description": "This project was custom-built to provide expert advice on contracts for users, such as union members and representatives. The goal is to streamline the process of getting contract-related information, reducing the need to navigate complex documents and systems. Recognizing the potential for automation, I utilized my programming skills to develop this tool. The application is designed to be user-friendly, efficient, and informative, ensuring that users receive accurate responses to their inquiries.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aeh961/Contract-Answerer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Aeh961/Contract-Answerer/issues"
+  },
+  "homepage": "https://github.com/Aeh961/Contract-Answerer#readme"
+}
