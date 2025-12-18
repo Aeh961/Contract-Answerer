@@ -12,3 +12,4 @@ chroma.sqlite3
 *.bin
 *.pickle
 frontend/node_modules/
+data/contracts/*
