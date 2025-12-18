@@ -1,116 +1,106 @@
-Contract Answerer
+Contract Answerer 📄🤖
 
-Contract Answerer is an AI powered application that enables users to ask natural language questions about legal contracts and collective bargaining agreements and receive accurate, source grounded answers in seconds.
+AI powered contract and policy question answering system
 
-The project demonstrates real world use of retrieval augmented generation to make long, complex PDF documents searchable, explainable, and usable for non legal audiences.
+Contract Answerer is a retrieval augmented generation application that allows users to ask natural language questions about legal contracts and collective bargaining agreements and receive accurate, source grounded answers.
 
-Problem This Solves
+Built as a portfolio project to demonstrate real world AI system design, document retrieval, and end to end application development.
 
-Legal and employment contracts are often hundreds of pages long and difficult to interpret. Finding answers to simple questions like eligibility, benefits, or policy rules requires significant time and expertise.
+🚀 Why This Project
 
-Contract Answerer reduces this friction by combining semantic search and large language models to deliver fast, reliable answers tied directly to the source document.
+Legal and employment contracts are long, technical, and difficult to navigate. Finding answers to simple questions often requires reading hundreds of pages or consulting experts.
 
-Key Capabilities
+Contract Answerer solves this by combining semantic search and large language models to deliver fast, reliable answers grounded in the original contract text.
 
-Natural language Q and A over PDF contracts
+This mirrors the architecture used in enterprise knowledge bases and internal search tools.
 
-Semantic search using vector embeddings
+✨ Features
 
-Retrieval augmented generation to reduce hallucinations
+• Natural language Q and A over PDF contracts
+• Semantic search using vector embeddings
+• Retrieval augmented generation to reduce hallucinations
+• Chat based web interface for non technical users
+• Modular ingestion pipeline for adding new documents
 
-Chat based web interface for non technical users
+🧠 How It Works
 
-Modular design that supports adding new documents easily
+Contract PDFs are ingested and split into text chunks
 
-System Architecture
-
-PDF contracts are ingested and split into chunks
-
-Each chunk is converted into embeddings
+Chunks are converted into embeddings
 
 Embeddings are stored in a vector database
 
-User queries are embedded and matched semantically
+User questions are embedded and matched semantically
 
 Relevant contract sections are retrieved
 
-The LLM generates an answer grounded in retrieved text
+The LLM generates an answer using only retrieved content
 
-This mirrors production grade RAG systems used in enterprise search and internal knowledge tools.
+This approach keeps responses accurate, explainable, and traceable.
 
-Tech Stack
+🛠️ Tech Stack
 
-Python
+• Python
+• Streamlit for the web interface
+• LangChain for LLM orchestration
+• ChromaDB for vector storage
+• OpenAI embeddings and language models
+• PDF parsing utilities
 
-Streamlit for frontend and interaction
-
-LangChain for LLM orchestration
-
-ChromaDB for vector storage
-
-OpenAI embeddings and language models
-
-PDF parsing libraries
-
-Code Overview
+📁 Project Structure
 
 app.py
-Handles the Streamlit UI, chat interaction, and answer generation pipeline.
+Main Streamlit application handling UI, chat flow, and response generation.
 
 load.py
-Manages document ingestion, chunking, embedding creation, and storage in ChromaDB.
+Document ingestion pipeline including PDF loading, chunking, embeddings, and storage.
 
-Contracts directory
-Houses PDF contract files used by the application.
+Contracts/
+Folder containing PDF contracts used by the application.
 
-Example Questions It Can Answer
+env/
+Python virtual environment for dependency isolation.
 
-What happens if my role is reclassified
+💬 Example Questions
 
-What is the remote work policy
+• What happens if my position is reclassified
+• What is the remote work policy
+• How much notice is required before a layoff
+• What benefits am I entitled to under this agreement
 
-How much notice is required before a layoff
+🏃‍♂️ Running Locally
 
-What benefits am I entitled to under this agreement
+Clone the repository
 
-Why This Matters to Employers
+Create and activate a Python virtual environment
 
-This project demonstrates hands on experience with:
+Install dependencies from requirements.txt
 
-Designing and implementing RAG systems
+Set your OpenAI API key as an environment variable
 
-Working with unstructured data at scale
+Run the app with Streamlit
 
-Building end to end AI applications
+streamlit run app.py
 
-Applying prompt engineering and retrieval strategies
+🎯 What This Demonstrates
 
-Creating user friendly interfaces for complex systems
+• End to end RAG system design
+• Working with unstructured document data
+• Vector databases and semantic retrieval
+• Prompt engineering and grounding strategies
+• Building user facing AI applications
 
-The same architecture applies to internal knowledge bases, policy search tools, HR systems, and enterprise document search products.
+This architecture is directly applicable to HR tools, internal documentation search, policy engines, and enterprise AI assistants.
 
-Future Enhancements
+🔮 Future Improvements
 
-Inline citations and highlighted source text
+• Inline citations with highlighted source text
+• Multi document and multi contract querying
+• Authentication and access control
+• Answer confidence scoring and evaluation
 
-Multi document and multi contract querying
-
-Authentication and role based access
-
-Improved evaluation and answer confidence scoring
-
-About Me
+👤 About the Author
 
 Abdallah Elhamawi
 MS Software Development candidate at Boston University
-Interested in AI powered systems, applied machine learning, and building products that improve access to information
-
-If you want, I can also:
-
-Rewrite this to match a specific job posting
-
-Add a short Architecture section with a diagram description
-
-Create a one paragraph project blurb for resumes and LinkedIn
-
-Optimize this for ATS keyword scanning
+Focused on applied AI, software engineering, and ethical AI systems
