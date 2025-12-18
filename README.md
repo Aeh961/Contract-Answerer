@@ -1,106 +1,79 @@
-Contract Answerer 📄🤖
+# Contract Answerer
 
-AI powered contract and policy question answering system
+An AI powered document question answering application that allows users to ask natural language questions about long PDF documents and receive accurate, source grounded answers.
 
-Contract Answerer is a retrieval augmented generation application that allows users to ask natural language questions about legal contracts and collective bargaining agreements and receive accurate, source grounded answers.
+This project demonstrates a production minded implementation of retrieval augmented generation using modern LLM tooling.
 
-Built as a portfolio project to demonstrate real world AI system design, document retrieval, and end to end application development.
+## Demo
+90 second walkthrough and setup video: <link here>
 
-🚀 Why This Project
+## Why this project matters
+Many real world workflows depend on large and complex documents that are difficult to search or reason about manually. This project explores how large language models, embeddings, and vector search can be combined to make long form documents immediately useful while minimizing hallucinations.
 
-Legal and employment contracts are long, technical, and difficult to navigate. Finding answers to simple questions often requires reading hundreds of pages or consulting experts.
+## Key features
+1. Ask natural language questions over arbitrary PDF documents
+2. Embeddings based retrieval for precise context selection
+3. Context constrained LLM responses to improve accuracy
+4. Simple and fast UI designed for iteration and experimentation
 
-Contract Answerer solves this by combining semantic search and large language models to deliver fast, reliable answers grounded in the original contract text.
+## Tech stack
+1. Python
+2. Streamlit
+3. OpenAI API
+4. ChromaDB
+5. LangChain
 
-This mirrors the architecture used in enterprise knowledge bases and internal search tools.
+## Quickstart two minutes
 
-✨ Features
+Step 1 Clone the repository
 
-• Natural language Q and A over PDF contracts
-• Semantic search using vector embeddings
-• Retrieval augmented generation to reduce hallucinations
-• Chat based web interface for non technical users
-• Modular ingestion pipeline for adding new documents
+    git clone https://github.com/Aeh961/Contract-Answerer.git
+    cd Contract-Answerer
 
-🧠 How It Works
+Step 2 Create and activate a virtual environment
 
-Contract PDFs are ingested and split into text chunks
+    python -m venv .venv
+    source .venv/bin/activate
 
-Chunks are converted into embeddings
+Step 3 Install dependencies
 
-Embeddings are stored in a vector database
+    pip install -r requirements.txt
 
-User questions are embedded and matched semantically
+Step 4 Add your documents
 
-Relevant contract sections are retrieved
+    mkdir -p data/contracts
 
-The LLM generates an answer using only retrieved content
+Place any PDF files you want to query into the data contracts folder.
 
-This approach keeps responses accurate, explainable, and traceable.
+Step 5 Set your API key
 
-🛠️ Tech Stack
+    export OPENAI_API_KEY="your_key_here"
 
-• Python
-• Streamlit for the web interface
-• LangChain for LLM orchestration
-• ChromaDB for vector storage
-• OpenAI embeddings and language models
-• PDF parsing utilities
+Step 6 Run the application
 
-📁 Project Structure
+    streamlit run src/app.py
 
-app.py
-Main Streamlit application handling UI, chat flow, and response generation.
+## How it works
+1. PDF documents are loaded and split into semantic chunks
+2. Each chunk is embedded and stored in a vector database
+3. User questions retrieve the most relevant chunks
+4. The language model generates answers using only retrieved context
 
-load.py
-Document ingestion pipeline including PDF loading, chunking, embeddings, and storage.
+## Project structure
 
-Contracts/
-Folder containing PDF contracts used by the application.
+    src
+      app.py          Streamlit application
+      load.py         Document ingestion and embedding
+    data
+      contracts       User provided PDFs
+    README.md
+    requirements.txt
 
-env/
-Python virtual environment for dependency isolation.
+## Future improvements
+1. Inline citations with highlighted source text
+2. Streaming responses for improved user experience
+3. Document metadata filtering
+4. Cost and latency optimizations
 
-💬 Example Questions
-
-• What happens if my position is reclassified
-• What is the remote work policy
-• How much notice is required before a layoff
-• What benefits am I entitled to under this agreement
-
-🏃‍♂️ Running Locally
-
-Clone the repository
-
-Create and activate a Python virtual environment
-
-Install dependencies from requirements.txt
-
-Set your OpenAI API key as an environment variable
-
-Run the app with Streamlit
-
-streamlit run app.py
-
-🎯 What This Demonstrates
-
-• End to end RAG system design
-• Working with unstructured document data
-• Vector databases and semantic retrieval
-• Prompt engineering and grounding strategies
-• Building user facing AI applications
-
-This architecture is directly applicable to HR tools, internal documentation search, policy engines, and enterprise AI assistants.
-
-🔮 Future Improvements
-
-• Inline citations with highlighted source text
-• Multi document and multi contract querying
-• Authentication and access control
-• Answer confidence scoring and evaluation
-
-👤 About the Author
-
-Abdallah Elhamawi
-MS Software Development candidate at Boston University
-Focused on applied AI, software engineering, and ethical AI systems
+## Author
+Built by Abdallah Elhamawi as part of a broader exploration into practical and reliable AI systems.
